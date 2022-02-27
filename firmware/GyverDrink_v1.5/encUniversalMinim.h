@@ -1,5 +1,5 @@
 // мини-класс для работы с энкодером, версия 1.0
-
+#if 0
 class encMinim
 {
   public:
@@ -103,3 +103,4 @@ boolean encMinim::isClick() {
     return true;
   } else return false;
 }
+#endif

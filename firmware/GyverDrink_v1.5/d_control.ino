@@ -27,7 +27,7 @@ void btnTick() {
     workMode = !workMode;
     dispMode();
   }
-  if (encBtn.holded()) {
+  if (!analogReadBool (ENC_BUTTON)/*encBtn.holded()*/) {
     pumpON();
     while (/*!digitalRead(ENC_SW)*/ !analogReadBool (ENC_BUTTON));
     timeoutReset();

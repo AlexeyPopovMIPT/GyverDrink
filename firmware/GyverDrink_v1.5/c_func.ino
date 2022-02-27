@@ -67,7 +67,7 @@ void serviceMode() {
       }
 
       if (btn.holded()) {
-        Serial.println ("Button holded, exit inf loop in serviceMode");
+        DEBUG ("Button holded, exit inf loop in serviceMode");
         servo.setTargetDeg(0);
         break;
       }
@@ -81,9 +81,9 @@ void serviceMode() {
 // выводим объём и режим
 void dispMode() {
   disp.displayInt(thisVolume);
-  if (workMode) disp.displayByte(0, _A);
+  if (workMode) disp.displayByte(_A, 0);
   else {
-    disp.displayByte(0, _P);
+    disp.displayByte(_P, 0);
     pumpOFF();
   }
 }
@@ -92,14 +92,14 @@ void dispMode() {
 void flowTick() {
   if (FLOWdebounce.isReady()) {
     for (byte i = 0; i < CUM_SHOTS; i++) {
-      bool swState = !analogReadBool(SW_pins[i]) ^ SWITCH_LEVEL;
+      bool swState = !digitalRead(SW_pins[i]) ^ SWITCH_LEVEL;
       if (swState && shotStates[i] == NO_GLASS) {  // поставили пустую рюмку
         timeoutReset();                                             // сброс таймаута
         shotStates[i] = EMPTY;                                      // флаг на заправку
         strip.setLED(i, mCOLOR(RED));                               // подсветили
         LEDchanged = true;
-        DEBUG("set glass");
-        DEBUG(i);
+        Serial.print ("set glass");
+        DEBUG (i);
       }
       if (!swState && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
         shotStates[i] = NO_GLASS;                                   // статус - нет рюмки
@@ -112,8 +112,8 @@ void flowTick() {
           WAITtimer.reset();
           pumpOFF();                                                // помпу выкл
         }
-        DEBUG("take glass");
-        DEBUG(i);
+        Serial.print ("take glass");
+        DEBUG (i);
       }
     }
 

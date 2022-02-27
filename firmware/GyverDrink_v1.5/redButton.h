@@ -1,3 +1,4 @@
+#if 0
 class glassButton ()
 {
   int8_t _pin;
@@ -13,3 +14,4 @@ class glassButton ()
       return !btnState;
     }
 };
+#endif
