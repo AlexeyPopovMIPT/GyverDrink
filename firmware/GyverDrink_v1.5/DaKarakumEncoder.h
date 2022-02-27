@@ -1,3 +1,7 @@
+/*
+ * Источник: https://duino.ru/blog/all/enkoder-arduino-kod-obrabotki/
+ */
+
 const int NONE = 0;
 enum ENC_STATE {
     ROTATION = 1,
