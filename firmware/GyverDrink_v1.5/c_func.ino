@@ -1,10 +1,17 @@
 // различные функции
 boolean analogReadBool (int pin) {
-  return analogRead (pin) > 200;
+  int ret = analogRead (pin);
+  if (pin == BTN_PIN)
+  {
+    // Serial.print ("BTN_PIN = ");
+    // Serial.println (ret);
+  }
+  return ret > 200;
 }
 
 void serviceMode() {
-  if (!analogReadBool(BTN_PIN)) {
+  while (analogReadBool (BTN_PIN)) ;
+  if (true || !analogReadBool(BTN_PIN)) {
     byte serviceText[] = {_S, _E, _r, _U, _i, _C, _E};
     disp.runningString((int8_t *)serviceText, sizeof(serviceText), 150); // DA_K: добавил (int_t *)
     while (!analogReadBool(BTN_PIN));  // ждём отпускания
@@ -58,10 +65,9 @@ void serviceMode() {
         disp.displayInt(servoPos);
         servo.setTargetDeg(servoPos);
       }
-      else
-        DEBUG("no turn");
 
       if (btn.holded()) {
+        Serial.println ("Button holded, exit inf loop in serviceMode");
         servo.setTargetDeg(0);
         break;
       }

@@ -60,9 +60,9 @@ const long time50ml = 5500;
 #define SERVO_PIN 5
 #define LED_PIN 6
 #define BTN_PIN A4
-#define ENC_SW 10 // кнопка
-#define ENC_DT 9 // импульсы направления энкодера
-#define ENC_CLK 8 // импульсы отсчёта энкодера 
+#define ENC_SW 10 // кнопка (unused)
+#define ENC_DT 9 // импульсы направления энкодера (unused)
+#define ENC_CLK 8 // импульсы отсчёта энкодера (unused)
 #define DISP_DIO 11
 #define DISP_RCLK 12
 #define DISP_SCLK 13
@@ -122,8 +122,8 @@ bool parking = false;
 // =========== МАКРО ===========
 #define servoON() digitalWrite(SERVO_POWER, 1)
 #define servoOFF() digitalWrite(SERVO_POWER, 0)
-#define pumpON() digitalWrite(PUMP_POWER, 1)
-#define pumpOFF() digitalWrite(PUMP_POWER, 0)
+#define pumpON() digitalWrite(PUMP_POWER, 1);
+#define pumpOFF() digitalWrite(PUMP_POWER, 0);
 
 #if (DEBUG_UART == 1)
 #define DEBUG(x) Serial.println(x)

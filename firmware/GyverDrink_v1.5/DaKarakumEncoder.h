@@ -44,6 +44,13 @@ public:
 };
 
 boolean DaKarakumEncoder::isClick() {
+  if (enc_state == PRESS || enc_state == LONG_PRESS || enc_state == ROTATION_PRESS)
+  {
+    // enc_state = NONE;
+    Serial.println ("press");
+    return true;
+  }
+  else return false;
   return enc_state == PRESS || enc_state == LONG_PRESS || enc_state == ROTATION_PRESS;
 }
 
@@ -61,7 +68,7 @@ boolean DaKarakumEncoder::isRight() {
 }
 
 boolean DaKarakumEncoder::isLeft() {
-  if (currentRotate == RIGHT)
+  if (currentRotate == LEFT)
   {
     currentRotate = NONE;
     return true;
@@ -71,52 +78,56 @@ boolean DaKarakumEncoder::isLeft() {
 
 ISR (PCINT1_vect) //Обработчик прерывания от пинов A1, A2, A3
 {
-  uint8_t comb = bitRead(PINC, 3) << 2 | bitRead(PINC, 2) << 1 | bitRead(PINC, 1); //считываем состояние пинов энкодера и кнопки
-  // comb = 0b[A3][A2][A1]
+    uint8_t comb = bitRead(PINC, 3) << 2 | bitRead(PINC, 2) << 1 | bitRead(PINC, 1); //считываем состояние пинов энкодера и кнопки
+    // comb = 0b[A3][A2][A1]
 
- if (comb == 0b011 && lastcomb == 0b111) btn_press=1; //Если было нажатие кнопки, то меняем статус
+    if (comb == 0b011 && lastcomb == 0b111) 
+        btn_press=1; //Если было нажатие кнопки, то меняем статус
  
- if (comb == 0b100)                         //Если было промежуточное положение энкодера, то проверяем его предыдущее состояние 
- {
-    if (lastcomb == 0b101) 
+    if (comb == 0b100)                         //Если было промежуточное положение энкодера, то проверяем его предыдущее состояние 
     {
-      --enc_rotation; //вращение по часовой стрелке
-      currentRotate = RIGHT;
+        if (lastcomb == 0b101)
+        {
+            --enc_rotation; //вращение по часовой стрелке
+            currentRotate = RIGHT;
+        }
+        if (lastcomb == 0b110)
+        {
+            ++enc_rotation; //вращение против часовой
+            currentRotate = LEFT;
+        }
+        enc_state=1;                       // был поворот энкодера    
+        btn_enc_rotate=0;                  //обнулить показания вращения с нажатием
     }
-    if (lastcomb == 0b110){
-      ++enc_rotation; //вращение против часовой
-      currentRotate = LEFT;
-    }
-    enc_state=1;                       // был поворот энкодера    
-    btn_enc_rotate=0;                  //обнулить показания вращения с нажатием
-  }
   
-   if (comb == 0b000)                      //Если было промежуточное положение энкодера и нажатие, то проверяем его предыдущее состояние 
-   {
-    if (lastcomb == 0b001) { 
-      --btn_enc_rotate; //вращение по часовой стрелке
-      currentRotate = RIGHT;
+    if (comb == 0b000)                      //Если было промежуточное положение энкодера и нажатие, то проверяем его предыдущее состояние 
+    {
+        if (lastcomb == 0b001) 
+        { 
+            --btn_enc_rotate; //вращение по часовой стрелке
+            currentRotate = RIGHT;
+        }
+        if (lastcomb == 0b010) 
+        { 
+            ++btn_enc_rotate; //вращение против частовой
+            currentRotate = LEFT;
+        }
+        enc_state = ROTATION_PRESS;                        // был поворот энкодера с нажатием  
+        enc_rotation = 0;                     //обнулить показания вращения без нажатия
+        btn_press = 0;                         //обнулить показания кнопки
     }
-    if (lastcomb == 0b010) { 
-      ++btn_enc_rotate; //вращение против частовой
-      currentRotate = LEFT;
-    }
-    enc_state = ROTATION_PRESS;                        // был поворот энкодера с нажатием  
-    enc_rotation = 0;                     //обнулить показания вращения без нажатия
-    btn_press = 0;                         //обнулить показания кнопки
-   }
 
-   if (comb == 0b111 && lastcomb == 0b011 && btn_press) //Если было отпускание кнопки, то проверяем ее предыдущее состояние 
-   {
-     if (millis() - timer > btn_long_push)         // проверяем сколько прошло миллисекунд
-     {
-       enc_state = LONG_PRESS;                              // было длинное нажатие 
-     } else {
-       enc_state = PRESS;                    // было нажатие 
-     }
-     btn_press = 0;                           //обнулить статус кнопки
-     }
+    if (comb == 0b111 && lastcomb == 0b011 && btn_press) //Если было отпускание кнопки, то проверяем ее предыдущее состояние 
+    {
+        if (millis() - timer > btn_long_push)         // проверяем сколько прошло миллисекунд
+        {
+            enc_state = LONG_PRESS;                              // было длинное нажатие 
+        } else {
+            enc_state = PRESS;                    // было нажатие 
+        }   
+        btn_press = 0;                           //обнулить статус кнопки
+    }
    
-  timer = millis();                       //сброс таймера
-  lastcomb = comb;                        //сохраняем текущее состояние энкодера
+    timer = millis();                       //сброс таймера
+    lastcomb = comb;                        //сохраняем текущее состояние энкодера
 }

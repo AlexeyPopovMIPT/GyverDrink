@@ -1,8 +1,10 @@
 void setup() {
+  
 #if (DEBUG_UART == 1)
   Serial.begin(9600);
   DEBUG("start");
 #endif
+
   // епром
   if (EEPROM.read(1000) != 10) {
     EEPROM.write(1000, 10);
@@ -21,8 +23,8 @@ void setup() {
   DEBUG("strip init");
 
   // настройка пинов
-  pinMode(PUMP_POWER, 1);
-  pinMode(SERVO_POWER, 1);
+  pinMode(PUMP_POWER, OUTPUT);
+  pinMode(SERVO_POWER, OUTPUT);
   for (byte i = 0; i < CUM_SHOTS; i++) {
     if (SWITCH_LEVEL == 0) pinMode(SW_pins[i], INPUT_PULLUP);
   }
